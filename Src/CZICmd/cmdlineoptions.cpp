@@ -996,6 +996,11 @@ void CCmdLineOptions::ParseChannelCompositionFormat(const wchar_t* s)
 		this->channelCompositePixelType = libCZI::PixelType::Bgr24;
 		return;
 	}
+	if (__wcasecmp(arg.c_str(), L"gray8"))
+	{
+		this->channelCompositePixelType = libCZI::PixelType::Gray8;
+		return;
+	}
 	else if (__wcasecmp(arg.c_str(), L"bgra32"))
 	{
 		this->channelCompositePixelType = libCZI::PixelType::Bgra32;
