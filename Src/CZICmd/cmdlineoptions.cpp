@@ -391,7 +391,8 @@ void CCmdLineOptions::PrintUsage(int switchesCnt, std::function<std::tuple<std::
 		{
 			L"m",
 			L"CHANNELCOMPOSITIONFORMAT",
-			LR"_(In case of a channel-composition, specifies the pixeltype of the output. Possible values are "bgr24" (the default) and "bgra32".
+			LR"_(In case of a channel-composition, specifies the pixeltype of the output. Possible values are "bgr24" (the default), "gray8", and "bgra32".
+			If specifying "gray8", a gray-scale of "bgr24" is produced.
 			If specifying "bgra32" it is possible to give the value of the alpha-pixels in the form "bgra32(128)" - for an alpha-value of 128.)_"
 		}
 	};

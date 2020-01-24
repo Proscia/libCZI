@@ -29,8 +29,6 @@
 #include "utils.h"
 #include "DisplaySettingsHelper.h"
 #include "inc_rapidjson.h"
-#include "../libCZI/BitmapOperations.h"
-#include "../libCZI/Site.h"
 #include <iomanip>
 #include <map>
 #include <fstream>
@@ -755,22 +753,10 @@ public:
 				dsplHlp.GetChannelInfosArray());
 			break;
 		case libCZI::PixelType::Gray8:
-            {
-			  shared_ptr<IBitmapData> mcCompositeBgr24;
-			  mcCompositeBgr24 = libCZI::Compositors::ComposeMultiChannel_Bgr24(
-                  (int)channelBitmaps.size(),
-				  std::begin(channelBitmaps),
-				  dsplHlp.GetChannelInfosArray());
-			 
-			  if (mcCompositeBgr24) {
-				mcComposite = GetSite()->CreateBitmap(PixelType::Gray8, mcCompositeBgr24->GetWidth(), mcCompositeBgr24->GetHeight());
-				libCZI::ScopedBitmapLockerP locked_bgr24{mcCompositeBgr24.get()};
-				libCZI::ScopedBitmapLockerP locked_gray8{mcComposite.get()};
-				CBitmapOperations::Copy(libCZI::PixelType::Bgr24, locked_bgr24.ptrDataRoi, locked_bgr24.stride,
-										libCZI::PixelType::Gray8, locked_gray8.ptrDataRoi, locked_gray8.stride,
-										mcCompositeBgr24->GetWidth(), mcCompositeBgr24->GetHeight(), false);
-			  }
-			}
+			mcComposite = libCZI::Compositors::ComposeMultiChannel_Gray8(
+				(int)channelBitmaps.size(),
+				std::begin(channelBitmaps),
+				dsplHlp.GetChannelInfosArray());
 			break;
 		case libCZI::PixelType::Bgra32:
 			mcComposite = libCZI::Compositors::ComposeMultiChannel_Bgra32(
@@ -957,22 +943,10 @@ public:
 				dsplHlp.GetChannelInfosArray());
 			break;
 		case libCZI::PixelType::Gray8:
-            {
-			  shared_ptr<IBitmapData> mcCompositeBgr24;
-			  mcCompositeBgr24 = libCZI::Compositors::ComposeMultiChannel_Bgr24(
-                  (int)channelBitmaps.size(),
-				  std::begin(channelBitmaps),
-				  dsplHlp.GetChannelInfosArray());
-			 
-			  if (mcCompositeBgr24) {
-				mcComposite = GetSite()->CreateBitmap(PixelType::Gray8, mcCompositeBgr24->GetWidth(), mcCompositeBgr24->GetHeight());
-				libCZI::ScopedBitmapLockerP locked_bgr24{mcCompositeBgr24.get()};
-				libCZI::ScopedBitmapLockerP locked_gray8{mcComposite.get()};
-				CBitmapOperations::Copy(libCZI::PixelType::Bgr24, locked_bgr24.ptrDataRoi, locked_bgr24.stride,
-										libCZI::PixelType::Gray8, locked_gray8.ptrDataRoi, locked_gray8.stride,
-										mcCompositeBgr24->GetWidth(), mcCompositeBgr24->GetHeight(), false);
-			  }
-			}
+			mcComposite = libCZI::Compositors::ComposeMultiChannel_Gray8(
+				(int)channelBitmaps.size(),
+				std::begin(channelBitmaps),
+				dsplHlp.GetChannelInfosArray());
 			break;
 		case libCZI::PixelType::Bgra32:
 			mcComposite = libCZI::Compositors::ComposeMultiChannel_Bgra32(

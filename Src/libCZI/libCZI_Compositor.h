@@ -27,6 +27,8 @@
 #include <limits>
 #include "libCZI_Pixels.h"
 #include "libCZI_Metadata.h"
+#include "Site.h"
+#include "BitmapOperations.h"
 
 namespace libCZI
 {
@@ -488,6 +490,37 @@ namespace libCZI
 			}
 
 			return ComposeMultiChannel_Bgr24(channelCount, &vecBm[0], channelInfos);
+		}
+
+		/// Create the multi-channel-composite - applying tinting or gradation to the specified
+		/// bitmaps and write the result to the specified destination bitmap.
+		/// All source bitmaps must have same width and height, and the destination bitmap also
+		/// has to have this same width/height. The pixeltype of the destination bitmap must be
+		/// Gray8.
+		///
+		/// \param channelCount		  Number of channels.
+		/// \param srcBitmapsIterator Source bitmaps iterator.
+		/// \param channelInfos An array of \c channelInfo for the source channels. The array must contain as many elements as specified by \c channelCount.
+		/// \return A std::shared_ptr&lt;IBitmapData&gt;.
+		static std::shared_ptr<IBitmapData> ComposeMultiChannel_Gray8(
+			int channelCount,
+			std::vector<std::shared_ptr<libCZI::IBitmapData>>::iterator srcBitmapsIterator,
+			const ChannelInfo* channelInfos)
+		{
+			std::shared_ptr<IBitmapData> mcCompositeBgr24 =
+			  ComposeMultiChannel_Bgr24(channelCount, srcBitmapsIterator, channelInfos);
+
+			if (mcCompositeBgr24) {
+			  std::shared_ptr<IBitmapData> mcCompositeGray8 =
+				GetSite()->CreateBitmap(PixelType::Gray8, mcCompositeBgr24->GetWidth(), mcCompositeBgr24->GetHeight());
+			  libCZI::ScopedBitmapLockerP locked_bgr24{mcCompositeBgr24.get()};
+			  libCZI::ScopedBitmapLockerP locked_gray8{mcCompositeGray8.get()};
+			  CBitmapOperations::Copy(libCZI::PixelType::Bgr24, locked_bgr24.ptrDataRoi, locked_bgr24.stride,
+									  libCZI::PixelType::Gray8, locked_gray8.ptrDataRoi, locked_gray8.stride,
+									  mcCompositeBgr24->GetWidth(), mcCompositeBgr24->GetHeight(), false);
+			  return mcCompositeGray8;
+			}
+			return mcCompositeBgr24;
 		}
 
 		/// Create the multi-channel-composite - applying tinting or gradation to the specified
