@@ -321,6 +321,11 @@ inline void CBitmapOperations::Copy<libCZI::PixelType::Gray8, libCZI::PixelType:
 	Copy<libCZI::PixelType::Gray8, libCZI::PixelType::Bgr48, CConvGray8ToBgr48>(CConvGray8ToBgr48(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
 }
 template <>
+inline void CBitmapOperations::Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
+{
+	Copy<libCZI::PixelType::Gray16, libCZI::PixelType::Gray8, CConvGray16ToGray8>(CConvGray16ToGray8(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+}
+template <>
 inline void CBitmapOperations::Copy<libCZI::PixelType::Gray8, libCZI::PixelType::Gray16>(const void* srcPtr, int srcStride, void* dstPtr, int dstStride, int width, int height, bool drawTileBorder)
 {
 	Copy<libCZI::PixelType::Gray8, libCZI::PixelType::Gray16, CConvGray8ToGray16>(CConvGray8ToGray16(), srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);

@@ -81,7 +81,9 @@ using namespace std;
 	case PixelType::Gray16:
 		switch (dstPixelType)
 		{
-		case PixelType::Gray8:break;
+		case PixelType::Gray8:
+			Copy<PixelType::Gray16, PixelType::Gray8>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
+			return;
 		case PixelType::Gray16:
 			Copy<PixelType::Gray16, PixelType::Gray16>(srcPtr, srcStride, dstPtr, dstStride, width, height, drawTileBorder);
 			return;
