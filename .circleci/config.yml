@@ -30,10 +30,10 @@ jobs:
             shopt -s globstar
             ls -l **/*.{a,so} **/CZIcmd
 
+            # Test for successful builds.
             [ -x Src/libCZI/liblibCZI.so ] \
                 && [ -x Src/libCZI/liblibCZIStatic.a ] \
                 && [ -x Src/CZICmd/CZIcmd ]
-            [ -x foo ]
 
 
 workflows:
