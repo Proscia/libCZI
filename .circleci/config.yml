@@ -22,10 +22,18 @@ jobs:
             git status -uno
 
       - run:
-          name: Where am I?
+          name: Build libCZI
           command: |
-            whoami
+            cmake -G "Unix Makefiles"
+            make
 
+            shopt -s globstar
+            ls -l **/*.{a,so} **/CZIcmd
+
+            [ -x Src/libCZI/liblibCZI.so ] \
+                && [ -x Src/libCZI/liblibCZIStatic.a ] \
+                && [ -x Src/CZICmd/CZIcmd ]
+            [ -x foo ]
 
 
 workflows:
