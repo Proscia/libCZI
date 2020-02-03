@@ -31,8 +31,8 @@ jobs:
             ls -l **/*.{a,so} **/CZIcmd
 
             # Test for successful builds.
-            [ -x Src/libCZI/liblibCZI.so ] \
-                && [ -x Src/libCZI/liblibCZIStatic.a ] \
+            [ -f Src/libCZI/liblibCZI.so ] \
+                && [ -f Src/libCZI/liblibCZIStatic.a ] \
                 && [ -x Src/CZICmd/CZIcmd ]
 
 
