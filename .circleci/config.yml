@@ -33,7 +33,25 @@ jobs:
             # Test for successful builds.
             [ -f Src/libCZI/liblibCZI.so ] \
                 && [ -f Src/libCZI/liblibCZIStatic.a ] \
+                && [ -f Src/JxrDecode/libJxrDecodeStatic.a ] \
                 && [ -x Src/CZICmd/CZIcmd ]
+
+      - run:
+          name: Publish build
+          environment:
+            DEPLOYMENT_BUCKET: deploy-proscia
+            MASTER_DIR: circleci/proscia/libCZI/master
+            LOCAL_DIR: templates/AWSCloudFormation
+          command: |
+            export DEPLOY_DIR="circleci"
+            export DEPLOY_DIR+="/${CIRCLE_PROJECT_USERNAME,,}"  # Using ${..,,} bash lower-case shell expansion
+            export DEPLOY_DIR+="/${CIRCLE_PROJECT_REPONAME,,}"
+            export DEPLOY_DIR+="/${CIRCLE_BRANCH,,}"
+
+            aws s3 sync Src s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*.a"
+            aws s3 sync Src s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "CZIcmd"
+
+            aws s3 ls s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR} --recursive
 
 
 workflows:
