@@ -40,15 +40,16 @@ jobs:
           name: Publish build
           environment:
             DEPLOYMENT_BUCKET: deploy-proscia
-            LOCAL_DIR: templates/AWSCloudFormation
+            LOCAL_DIR: Src
           command: |
             export DEPLOY_DIR="circleci"
             export DEPLOY_DIR+="/${CIRCLE_PROJECT_USERNAME,,}"  # Using ${..,,} bash lower-case shell expansion
             export DEPLOY_DIR+="/${CIRCLE_PROJECT_REPONAME,,}"
             export DEPLOY_DIR+="/${CIRCLE_BRANCH,,}"
 
-            aws s3 sync Src s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*.a"
-            aws s3 sync Src s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "CZIcmd"
+            aws s3 sync ${LOCAL_DIR} s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*.a"
+            aws s3 sync ${LOCAL_DIR} s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*.so"
+            aws s3 sync ${LOCAL_DIR}  s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*/CZIcmd"
 
             aws s3 ls s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR} --recursive
 
