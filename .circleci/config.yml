@@ -1,0 +1,67 @@
+version: 2.1
+jobs:
+  vanilla-build:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - checkout
+
+      - run:
+          name: Where am I?
+          command: |
+            whoami
+            pwd
+            df -h
+            ls -al
+            ls -al ~/.ssh
+            ssh-add -l
+            git config --global --list
+            git remote -v
+            # git branch -a  # Can cause build error ":Too long with no output (exceeded 10m0s)"
+            git status -uno
+
+      - run:
+          name: Build libCZI
+          command: |
+            cmake -G "Unix Makefiles"
+            make
+
+            shopt -s globstar
+            ls -l **/*.{a,so} **/CZIcmd
+
+            # Test for successful builds.
+            [ -f Src/libCZI/liblibCZI.so ] \
+                && [ -f Src/libCZI/liblibCZIStatic.a ] \
+                && [ -f Src/JxrDecode/libJxrDecodeStatic.a ] \
+                && [ -x Src/CZICmd/CZIcmd ]
+
+      - run:
+          name: Publish build
+          environment:
+            DEPLOYMENT_BUCKET: deploy-proscia
+            LOCAL_DIR: Src
+          command: |
+            export DEPLOY_DIR="circleci"
+            export DEPLOY_DIR+="/${CIRCLE_PROJECT_USERNAME,,}"  # Using ${..,,} bash lower-case shell expansion
+            export DEPLOY_DIR+="/${CIRCLE_PROJECT_REPONAME,,}"
+            export DEPLOY_DIR+="/${CIRCLE_BRANCH,,}"
+
+            aws s3 sync ${LOCAL_DIR} s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*.a"
+            aws s3 sync ${LOCAL_DIR} s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*.so"
+            aws s3 sync ${LOCAL_DIR}  s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR}/ --exclude "*" --include "*/CZIcmd"
+
+            aws s3 ls s3://${DEPLOYMENT_BUCKET}/${DEPLOY_DIR} --recursive
+
+
+workflows:
+  version: 2
+  vanilla_workflow:
+    jobs:
+      - vanilla-build:
+          context: dev-deployment-user
+          filters:
+            branches:
+              only:
+                - master
+                - master-circleci
