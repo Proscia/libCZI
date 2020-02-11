@@ -885,6 +885,8 @@ libCZI::RgbFloatColor CCmdLineOptions::ParseBackgroundColor(const wchar_t* s)
 		const wchar_t* endPtrSkipped = skipWhiteSpaceAndOneOfThese(endPtr, L";,|");
 		if (*endPtrSkipped == L'\0')
 			break;
+
+		s = endPtrSkipped;
 	}
 
 	if (isnan(f[1]) && isnan(f[2]))
