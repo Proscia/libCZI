@@ -840,6 +840,7 @@ public:
 		auto roi = GetRoiFromOptions(options, subBlockStatistics);
 		libCZI::CDimCoordinate coordinate = options.GetPlaneCoordinate();
 		libCZI::ISingleChannelPyramidLayerTileAccessor::Options scptaOptions; scptaOptions.Clear();
+		scptaOptions.drawTileBorder = options.GetDrawTileBoundaries();
 		scptaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
 		scptaOptions.sceneFilter = options.GetSceneIndexSet();
 		libCZI::ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo pyrLyrInfo;
