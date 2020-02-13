@@ -18,22 +18,67 @@ inline void CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStri
 		{
 			char* dest = ((char*)dstPtr) + y*((std::ptrdiff_t)dstStride);
 			const char* src = ((const char*)srcPtr) + y*((std::ptrdiff_t)srcStride);
+
+#if 1  // Fix downsampled background.
+			// Do not copy pre-shaded background of downsampled lower layers,
+			// allowing options specified background to remain.
+			bool is_downsample_background = false;
+
+			for (int i = bytesToCopy; i > 0; --i, ++dest, ++src) {
+			  // Check once per pixel, at every starting byte.
+			  if ((i % bytesPerPel) == 0) {
+				// Assume pure black or white is pre-shaded down-sampled background.
+				is_downsample_background = (*src == (char)0 || *src == (char)255);
+				for (const char* s = src + bytesPerPel - 1;
+					 is_downsample_background && s > src;
+					 --s) {
+				  if (*s != *src) { is_downsample_background = false; }
+				}
+			  }
+
+			  if (!is_downsample_background) { *dest = *src; }
+			}
+#else  // Keep downsampled background.
 			memcpy(dest, src, bytesToCopy);
+#endif // Fix downsampled background.
 		}
 	}
 	else
 	{
-		memset(dstPtr, 0, bytesToCopy);
+		memset(dstPtr, 0 /*255*/, bytesToCopy);
 		for (int y = 1; y < height - 1; ++y)
 		{
 			char* dest = ((char*)dstPtr) + y*((std::ptrdiff_t)dstStride);
 			const char* src = ((const char*)srcPtr) + y*((std::ptrdiff_t)srcStride);
-			memcpy(dest + bytesPerPel, src, bytesToCopy - 2 * bytesPerPel);
-			memset(dest, 0, bytesPerPel);
-			memset(dest + bytesToCopy - bytesPerPel, 0, bytesPerPel);
-		}
+			memset(dest, 0 /*255*/, bytesPerPel);
+			memset(dest + bytesToCopy - bytesPerPel, 0 /*255*/, bytesPerPel);
 
-		memset(((char*)dstPtr) + (height - 1)*dstStride, 0, bytesToCopy);
+#if 1  // Fix downsampled background.
+			// Do not copy pre-shaded background of downsampled lower layers,
+			// allowing options specified background to remain.
+			bool is_downsample_background = false;
+
+			dest += bytesPerPel;
+			src += bytesPerPel;
+			for (int i = bytesToCopy - 2 * bytesPerPel; i > 0; --i, ++dest, ++src) {
+			  // Check once per pixel, at every starting byte.
+			  if ((i % bytesPerPel) == 0) {
+				// Assume pure black or white is pre-shaded down-sampled background.
+				is_downsample_background = (*src == (char)0 || *src == (char)255);
+				for (const char* s = src + bytesPerPel - 1;
+					 is_downsample_background && s > src;
+					 --s) {
+				  if (*s != *src) { is_downsample_background = false; }
+				}
+			  }
+
+			  if (!is_downsample_background) { *dest = *src; }
+			}
+#else  // Keep downsampled background.
+			memcpy(dest + bytesPerPel, src + bytesPerPel, bytesToCopy - 2 * bytesPerPel);
+#endif // Fix downsampled background.
+		}
+		memset(((char*)dstPtr) + (height - 1)*dstStride, 0 /*255*/, bytesToCopy);
 	}
 }
 
