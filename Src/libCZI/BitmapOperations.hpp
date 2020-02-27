@@ -19,7 +19,7 @@ inline void CBitmapOperations::CopySamePixelType(const void* srcPtr, int srcStri
 			char* dest = ((char*)dstPtr) + y*((std::ptrdiff_t)dstStride);
 			const char* src = ((const char*)srcPtr) + y*((std::ptrdiff_t)srcStride);
 
-#if 1  // Fix downsampled background.
+#if 0  // Disable this, in case it interferes with real data. Still active in drawTileBorder debug mode below.  // Fix downsampled background.
 			// Do not copy pre-shaded background of downsampled lower layers,
 			// allowing options specified background to remain.
 			bool is_downsample_background = false;
