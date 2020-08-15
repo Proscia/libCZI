@@ -357,7 +357,7 @@ void CCmdLineOptions::PrintUsage(int switchesCnt, std::function<std::tuple<std::
 			L"i",
 			L"INFO-LEVEL",
 			LR"(When using the command 'PrintInformation' the INFO-LEVEL can be used to specify which information is printed. Possible
-			values are "Statistics", "RawXML", "DisplaySettings", "DisplaySettingsJson", "AllSubBlocks", "Attachments", "AllAttachments", 
+			values are "Statistics", "RawXML", "DisplaySettings", "DisplaySettingsJson", "DisplaySettingsJsonAll", "AllSubBlocks", "Attachments", "AllAttachments", 
             "PyramidStatistics", "GeneralInfo", "ScalingInfo" and "All". 
 			The values are given as a list separated by comma or semicolon.)"
 		},
@@ -820,6 +820,7 @@ void CCmdLineOptions::ParseInfoLevel(const wchar_t* s)
 		{ L"RawXML", InfoLevel::RawXML },
 		{ L"DisplaySettings", InfoLevel::DisplaySettings },
 		{ L"DisplaySettingsJson", InfoLevel::DisplaySettingsJson },
+		{ L"DisplaySettingsJsonAll", InfoLevel::DisplaySettingsJsonAll },
 		{ L"AllSubBlocks", InfoLevel::AllSubBlocks },
 		{ L"Attachments", InfoLevel::AttachmentInfo },
 		{ L"AllAttachments", InfoLevel::AllAttachments },
