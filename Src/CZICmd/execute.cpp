@@ -196,7 +196,12 @@ public:
 
 		if (options.IsInfoLevelEnabled(InfoLevel::DisplaySettingsJson))
 		{
-			PrintDisplaySettingsMetadataAsJson(spReader.get(), md.get(), options);
+			PrintDisplaySettingsMetadataAsJson(spReader.get(), md.get(), options, false);
+		}
+
+		if (options.IsInfoLevelEnabled(InfoLevel::DisplaySettingsJsonAll))
+		{
+			PrintDisplaySettingsMetadataAsJson(spReader.get(), md.get(), options, true);
 		}
 
 		if (options.IsInfoLevelEnabled(InfoLevel::AllSubBlocks))
@@ -377,7 +382,7 @@ private:
 		});
 	}
 
-	static void PrintDisplaySettingsMetadataAsJson(ICZIReader* reader, ICziMetadata* md, const CCmdLineOptions& options)
+	static void PrintDisplaySettingsMetadataAsJson(ICZIReader* reader, ICziMetadata* md, const CCmdLineOptions& options, bool all_json)
 	{
 		options.GetLog()->WriteStdOut("Display-Settings in CZIcmd-JSON-Format");
 		options.GetLog()->WriteStdOut("--------------------------------------");
@@ -390,7 +395,7 @@ private:
 			return;
 		}
 
-		string dsplSettingsJson = CreateJsonForDisplaySettings(dsplSettings.get());
+		string dsplSettingsJson = CreateJsonForDisplaySettings(dsplSettings.get(), all_json);
 
 		Document document;
 		document.Parse(dsplSettingsJson.c_str());
@@ -453,7 +458,7 @@ private:
 		options.GetLog()->WriteStdOut(ss.str());
 	}
 
-	static string CreateJsonForDisplaySettings(IDisplaySettings* dsplSettings)
+	static string CreateJsonForDisplaySettings(IDisplaySettings* dsplSettings, bool all_json)
 	{
 		StringBuffer s;
 		Writer<StringBuffer> writer(s);
@@ -464,11 +469,17 @@ private:
 			[&](int chIdx)->bool
 		{
 			auto dsplChannelSettings = dsplSettings->GetChannelDisplaySettings(chIdx);
-			if (dsplChannelSettings->GetIsEnabled())
+			if (dsplChannelSettings->GetIsEnabled() || all_json)
 			{
 				writer.StartObject();
 				writer.String("ch");
 				writer.Int(chIdx);
+
+				if (all_json) {
+					writer.String("enabled");
+					writer.Bool(dsplChannelSettings->GetIsEnabled());
+				}
+
 				float wght = dsplChannelSettings->GetWeight();
 				if (abs(wght - 1) > std::numeric_limits<float>::epsilon())
 				{

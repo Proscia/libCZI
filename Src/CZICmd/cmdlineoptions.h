@@ -63,8 +63,9 @@ enum class InfoLevel
 	PyramidStatistics = 128,
 	GeneralInfo = 256,
 	ScalingInfo = 512,
+	DisplaySettingsJsonAll = 1024,
 
-	All = Statistics | RawXML | DisplaySettings | DisplaySettingsJson | AllSubBlocks | AttachmentInfo | AllAttachments | PyramidStatistics | GeneralInfo | ScalingInfo
+	All = Statistics | RawXML | DisplaySettings | DisplaySettingsJson | DisplaySettingsJsonAll | AllSubBlocks | AttachmentInfo | AllAttachments | PyramidStatistics | GeneralInfo | ScalingInfo
 };
 
 struct ChannelDisplaySettings
