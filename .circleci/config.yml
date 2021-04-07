@@ -1,8 +1,9 @@
 version: 2.1
 jobs:
-  vanilla-build:
-    machine:
-      image: ubuntu-2004:202010-01
+  build:
+    docker:
+      - image: gliderlabs/herokuish:v0.5.27
+      - image: docker:stable-git
 
     steps:
       - checkout
