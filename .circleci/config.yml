@@ -4,6 +4,7 @@ jobs:
     docker:
       - image: gliderlabs/herokuish:v0.5.27
       - image: docker:stable-git
+      - image: banst/awscli
 
     steps:
       - checkout
