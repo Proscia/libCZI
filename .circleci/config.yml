@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   vanilla-build:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202010-01
 
     steps:
       - checkout
@@ -65,3 +65,4 @@ workflows:
               only:
                 - master
                 - master-circleci
+                - PLAT-2474
