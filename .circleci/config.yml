@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  valnilla-build:
+  vanilla-build:
     docker:
       - image: gliderlabs/herokuish:v0.5.27
       - image: docker:stable-git
