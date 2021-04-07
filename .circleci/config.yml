@@ -7,8 +7,11 @@ jobs:
       - image: gliderlabs/herokuish:v0.5.27
       - image: docker:stable-git
 
+    executor: aws-cli/default
+
     steps:
       - checkout
+      - aws-cli/setup
 
       - run:
           name: Where am I?
