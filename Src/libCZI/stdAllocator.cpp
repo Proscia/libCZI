@@ -30,16 +30,31 @@ void* CHeapAllocator::Allocate(std::uint64_t size)
 	{
 		throw std::out_of_range("The requested size for allocation is out-of-range.");
 	}
+
+	void* ptr = nullptr;
+	size_t actual_size = (size_t)size;
+
 #if defined(__EMSCRIPTEN__)||defined(__APPLE__)
-	return malloc((size_t)size);
+	ptr = malloc(actual_size);
 #else
 #if defined(__GNUC__)
-	return aligned_alloc(32, size);
+	// aligned_alloc requires size to be a multiple of alignment (32 bytes)
+	// Round up to nearest multiple of 32 to meet POSIX requirement
+	actual_size = ((actual_size + 31) / 32) * 32;
+	ptr = aligned_alloc(32, actual_size);
 #else
-	void* pv = _aligned_malloc((size_t)size, 32);
-	return pv;
+	ptr = _aligned_malloc(actual_size, 32);
 #endif
 #endif
+
+	// Initialize allocated memory to zero to prevent undefined behavior from
+	// uninitialized data being used in bitmap operations.
+	// See: https://github.com/ZEISS/libCZI/issues/40
+	if (ptr != nullptr) {
+		memset(ptr, 0, actual_size);
+	}
+
+	return ptr;
 }
 
 void CHeapAllocator::Free(void* ptr)
