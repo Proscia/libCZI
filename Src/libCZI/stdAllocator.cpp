@@ -5,6 +5,7 @@
 #include "stdAllocator.h"
 #include <limits>
 #include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 #include "libCZI_Config_Internal.h"
 
@@ -22,14 +23,17 @@ void* CHeapAllocator::Allocate(std::uint64_t size)
 #if LIBCZI_HAVE_ALIGNED_ALLOC
     // Specification requires that 'size' is an integral multiple of 'alignment' (https://en.cppreference.com/w/cpp/memory/c/aligned_alloc),
     // so we round up to the next multiple of 'alignment' here.
-    return aligned_alloc(ALLOC_ALIGNMENT, ((size+ALLOC_ALIGNMENT-1)/ALLOC_ALIGNMENT)*ALLOC_ALIGNMENT);
+    const size_t actual_size = ((size_t)size + ALLOC_ALIGNMENT - 1) / ALLOC_ALIGNMENT * ALLOC_ALIGNMENT;
+    void* ptr = aligned_alloc(ALLOC_ALIGNMENT, actual_size);
 #elif  LIBCZI_HAVE__ALIGNED_MALLOC
-    return _aligned_malloc((size_t)size, ALLOC_ALIGNMENT);
+    const size_t actual_size = (size_t)size;
+    void* ptr = _aligned_malloc(actual_size, ALLOC_ALIGNMENT);
 #else
     void* p1;
     void** p2;
     int offset = ALLOC_ALIGNMENT - 1 + sizeof(void*);
-    p1 = malloc(size + offset);
+    const size_t actual_size = (size_t)size;
+    p1 = malloc(actual_size + offset);
     if (p1 == nullptr)
     {
         return nullptr;
@@ -37,8 +41,19 @@ void* CHeapAllocator::Allocate(std::uint64_t size)
 
     p2 = (void**)(((size_t)(p1)+offset) & ~(size_t)(ALLOC_ALIGNMENT - 1));
     p2[-1] = p1;
-    return p2;
+    void* ptr = p2;
 #endif
+
+    // Zero-initialize allocated memory to prevent undefined behavior from stale
+    // heap contents being consumed by downstream bitmap operations.
+    // Originally reported upstream in zeiss-microscopy/libCZI#40 (Nov 2018) and
+    // closed there without a fix; ported from Proscia fork commit afd2c65.
+    if (ptr != nullptr)
+    {
+        memset(ptr, 0, actual_size);
+    }
+
+    return ptr;
 }
 
 void CHeapAllocator::Free(void* ptr)
