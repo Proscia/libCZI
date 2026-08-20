@@ -691,7 +691,7 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->check(CLI::Range(0.f, 1.f));
     cli_app.add_option("-i,--info-level", argument_info_level,
         "When using the command 'PrintInformation' the INFO-LEVEL can be used to specify which information is printed. Possible "
-        "values are \"Statistics\", \"RawXML\", \"DisplaySettings\", \"DisplaySettingsJson\", \"AllSubBlocks\", \"Attachments\", \"AllAttachments\", "
+        "values are \"Statistics\", \"RawXML\", \"DisplaySettings\", \"DisplaySettingsJson\", \"DisplaySettingsJsonAll\", \"AllSubBlocks\", \"Attachments\", \"AllAttachments\", "
         "\"PyramidStatistics\", \"GeneralInfo\", \"ScalingInfo\" and \"All\". "
         "The values are given as a list separated by comma or semicolon.")
         ->option_text("INFO-LEVEL")
@@ -1433,6 +1433,7 @@ bool CCmdLineOptions::TryParseDisplaySettings(const std::string& s, std::map<int
         { "RawXML", InfoLevel::RawXML },
         { "DisplaySettings", InfoLevel::DisplaySettings },
         { "DisplaySettingsJson", InfoLevel::DisplaySettingsJson },
+        { "DisplaySettingsJsonAll", InfoLevel::DisplaySettingsJsonAll },
         { "AllSubBlocks", InfoLevel::AllSubBlocks },
         { "Attachments", InfoLevel::AttachmentInfo },
         { "AllAttachments", InfoLevel::AllAttachments },
