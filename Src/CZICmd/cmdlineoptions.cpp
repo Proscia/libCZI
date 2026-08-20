@@ -708,7 +708,8 @@ CCmdLineOptions::ParseResult CCmdLineOptions::Parse(int argc, char** argv)
         ->option_text("FILTER")
         ->check(tilefilter_validator);
     cli_app.add_option("-m,--channelcompositionformat", argument_channelcompositionformat,
-        "In case of a channel-composition, specifies the pixeltype of the output. Possible values are \"bgr24\" (the default) and \"bgra32\". "
+        "In case of a channel-composition, specifies the pixeltype of the output. Possible values are \"bgr24\" (the default), \"gray8\" and \"bgra32\". "
+        "If specifying \"gray8\", a gray-scale of \"bgr24\" is produced. "
         "If specifying \"bgra32\" it is possible to give the value of the alpha-pixels in the form \"bgra32(128)\" - for an alpha-value of 128.")
         ->option_text("CHANNELCOMPOSITIONFORMAT")
         ->check(channelcompositionformat_validator);
@@ -1696,6 +1697,15 @@ std::shared_ptr<libCZI::IIndexSet> CCmdLineOptions::GetSceneIndexSet() const
         if (channel_composition_format != nullptr)
         {
             *channel_composition_format = libCZI::PixelType::Bgr24;
+        }
+
+        return true;
+    }
+    else if (icasecmp(arg, "gray8"))
+    {
+        if (channel_composition_format != nullptr)
+        {
+            *channel_composition_format = libCZI::PixelType::Gray8;
         }
 
         return true;

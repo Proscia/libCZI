@@ -643,6 +643,12 @@ public:
                 std::begin(channelBitmaps),
                 dsplHlp.GetChannelInfosArray());
             break;
+        case libCZI::PixelType::Gray8:
+            mcComposite = libCZI::Compositors::ComposeMultiChannel_Gray8(
+                (int)channelBitmaps.size(),
+                std::begin(channelBitmaps),
+                dsplHlp.GetChannelInfosArray());
+            break;
         case libCZI::PixelType::Bgra32:
             mcComposite = libCZI::Compositors::ComposeMultiChannel_Bgra32(
                 options.GetChannelCompositeOutputAlphaValue(),
@@ -825,6 +831,12 @@ public:
         {
         case libCZI::PixelType::Bgr24:
             mcComposite = libCZI::Compositors::ComposeMultiChannel_Bgr24(
+                (int)channelBitmaps.size(),
+                std::begin(channelBitmaps),
+                dsplHlp.GetChannelInfosArray());
+            break;
+        case libCZI::PixelType::Gray8:
+            mcComposite = libCZI::Compositors::ComposeMultiChannel_Gray8(
                 (int)channelBitmaps.size(),
                 std::begin(channelBitmaps),
                 dsplHlp.GetChannelInfosArray());
