@@ -59,7 +59,12 @@ public:
 
         if (options.IsInfoLevelEnabled(InfoLevel::DisplaySettingsJson))
         {
-            PrintDisplaySettingsMetadataAsJson(md.get(), options);
+            PrintDisplaySettingsMetadataAsJson(md.get(), options, false);
+        }
+
+        if (options.IsInfoLevelEnabled(InfoLevel::DisplaySettingsJsonAll))
+        {
+            PrintDisplaySettingsMetadataAsJson(md.get(), options, true);
         }
 
         if (options.IsInfoLevelEnabled(InfoLevel::AllSubBlocks))
@@ -253,7 +258,7 @@ private:
             });
     }
 
-    static void PrintDisplaySettingsMetadataAsJson(ICziMetadata* md, const CCmdLineOptions& options)
+    static void PrintDisplaySettingsMetadataAsJson(ICziMetadata* md, const CCmdLineOptions& options, bool all_json)
     {
         options.GetLog()->WriteLineStdOut("Display-Settings in CZIcmd-JSON-Format");
         options.GetLog()->WriteLineStdOut("--------------------------------------");
@@ -266,7 +271,7 @@ private:
             return;
         }
 
-        string dsplSettingsJson = CreateJsonForDisplaySettings(dsplSettings.get());
+        string dsplSettingsJson = CreateJsonForDisplaySettings(dsplSettings.get(), all_json);
 
         Document document;
         document.Parse(dsplSettingsJson.c_str());
@@ -329,7 +334,7 @@ private:
         options.GetLog()->WriteLineStdOut(ss.str());
     }
 
-    static string CreateJsonForDisplaySettings(IDisplaySettings* dsplSettings)
+    static string CreateJsonForDisplaySettings(IDisplaySettings* dsplSettings, bool all_json)
     {
         StringBuffer s;
         Writer<StringBuffer> writer(s);
@@ -340,11 +345,18 @@ private:
             [&](int chIdx)->bool
             {
                 auto dsplChannelSettings = dsplSettings->GetChannelDisplaySettings(chIdx);
-                if (dsplChannelSettings->GetIsEnabled())
+                if (dsplChannelSettings->GetIsEnabled() || all_json)
                 {
                     writer.StartObject();
                     writer.String("ch");
                     writer.Int(chIdx);
+
+                    if (all_json)
+                    {
+                        writer.String("enabled");
+                        writer.Bool(dsplChannelSettings->GetIsEnabled());
+                    }
+
                     float wght = dsplChannelSettings->GetWeight();
                     if (abs(wght - 1) > std::numeric_limits<float>::epsilon())
                     {
@@ -631,6 +643,12 @@ public:
                 std::begin(channelBitmaps),
                 dsplHlp.GetChannelInfosArray());
             break;
+        case libCZI::PixelType::Gray8:
+            mcComposite = libCZI::Compositors::ComposeMultiChannel_Gray8(
+                (int)channelBitmaps.size(),
+                std::begin(channelBitmaps),
+                dsplHlp.GetChannelInfosArray());
+            break;
         case libCZI::PixelType::Bgra32:
             mcComposite = libCZI::Compositors::ComposeMultiChannel_Bgra32(
                 options.GetChannelCompositeOutputAlphaValue(),
@@ -713,6 +731,7 @@ public:
         auto roi = GetRoiFromOptions(options, subBlockStatistics);
         libCZI::CDimCoordinate coordinate = options.GetPlaneCoordinate();
         libCZI::ISingleChannelPyramidLayerTileAccessor::Options scptaOptions; scptaOptions.Clear();
+        scptaOptions.drawTileBorder = options.GetDrawTileBoundaries();
         scptaOptions.backGroundColor = GetBackgroundColorFromOptions(options);
         scptaOptions.sceneFilter = options.GetSceneIndexSet();
         libCZI::ISingleChannelPyramidLayerTileAccessor::PyramidLayerInfo pyrLyrInfo;
@@ -812,6 +831,12 @@ public:
         {
         case libCZI::PixelType::Bgr24:
             mcComposite = libCZI::Compositors::ComposeMultiChannel_Bgr24(
+                (int)channelBitmaps.size(),
+                std::begin(channelBitmaps),
+                dsplHlp.GetChannelInfosArray());
+            break;
+        case libCZI::PixelType::Gray8:
+            mcComposite = libCZI::Compositors::ComposeMultiChannel_Gray8(
                 (int)channelBitmaps.size(),
                 std::begin(channelBitmaps),
                 dsplHlp.GetChannelInfosArray());
